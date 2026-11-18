@@ -55,10 +55,10 @@ export default function WhatsAppSnapshotModal({
 🗓 *Cycle:* ${currentMonth} ${currentYear}
 ────────────────────────
 💰 *Total Available Funds:* LKR ${groupStats.totalFunds.toLocaleString()}
-📥 *This Month Collection:* LKR ${groupStats.monthlyCollection.toLocaleString()} (${Math.round(actualComplianceRate)}% Paid - ${paidCount}/${activeMembersList.length})
+📥 *This Month's Collection:* LKR ${groupStats.monthlyCollection.toLocaleString()} (${Math.round(actualComplianceRate)}% Paid - ${paidCount}/${activeMembersList.length})
 💳 *Active Loans Out:* LKR ${totalLoanAmount.toLocaleString()} (${activeLoans.length} Active ${activeLoans.length === 1 ? 'Loan' : 'Loans'})
 ────────────────────────
-👥 *Member Roll Call:*
+👥 *Payment Status:*
 ${activeMembersList.map(m => {
   const isPaid = currentMonthPayments.some(p => p.memberId === m.id && p.paid);
   return `${isPaid ? '✅' : '⏳'} ${m.name}: ${isPaid ? 'Settled' : 'Pending'}`;
@@ -141,7 +141,7 @@ Verified by Admin: ${adminName}`;
             {/* Box 1: Collection / Inflow */}
             <div className="bg-white border-2 border-black p-3 sm:p-3.5 shadow-[2px_2px_0px_#000]">
               <div className="flex items-center justify-between text-black/60 mb-1">
-                <span className="text-[9px] font-black tracking-wider uppercase">Collection</span>
+                <span className="text-[9px] font-black tracking-wider uppercase">This Month's Collection</span>
                 <DollarSign className="w-3.5 h-3.5 text-black" />
               </div>
               <p className="text-lg sm:text-xl font-black text-black tracking-tight">
@@ -171,7 +171,7 @@ Verified by Admin: ${adminName}`;
           <div className="bg-white border-2 border-black p-3 mb-3 sm:mb-4 shadow-[2px_2px_0px_#000]">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-black tracking-wider uppercase text-black">
-                MEMBER ROLL CALL ({paidCount}/{activeMembersList.length})
+                PAYMENT STATUS ({paidCount}/{activeMembersList.length})
               </span>
               <span className="text-[9px] font-mono font-bold bg-[#FFE600] px-1.5 py-0.2 border border-black">
                 {paidCount === activeMembersList.length ? 'ALL SETTLED' : `${activeMembersList.length - paidCount} PENDING`}
