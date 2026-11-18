@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Share2, Copy, Check, X, Camera, Users, DollarSign, CreditCard, ArrowUpRight } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Share2, Copy, Check, X, Camera, Users, DollarSign, CreditCard, ArrowUpRight, Download, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { toPng, toBlob } from 'html-to-image';
 import { GroupStats, User, Payment, Loan } from '../../types';
 
 interface WhatsAppSnapshotModalProps {
@@ -26,6 +27,10 @@ export default function WhatsAppSnapshotModal({
   adminName
 }: WhatsAppSnapshotModalProps) {
   const [copied, setCopied] = useState(false);
+  const [imageCopied, setImageCopied] = useState(false);
+  const [isExporting, setIsExporting] = useState<'download' | 'copy' | null>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+
   const currentMonth = new Date().toLocaleString('default', { month: 'long' });
   const currentYear = new Date().getFullYear();
 
@@ -71,6 +76,51 @@ Verified by Admin: ${adminName}`;
     setTimeout(() => setCopied(false), 2500);
   };
 
+  const handleDownloadImage = async () => {
+    if (!cardRef.current) return;
+    try {
+      setIsExporting('download');
+      const dataUrl = await toPng(cardRef.current, {
+        pixelRatio: 2.5,
+        cacheBust: true,
+        backgroundColor: '#FAF9F6'
+      });
+      const link = document.createElement('a');
+      link.download = `FORT-Status-${currentMonth}-${currentYear}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('Failed to export PNG:', err);
+    } finally {
+      setIsExporting(null);
+    }
+  };
+
+  const handleCopyImage = async () => {
+    if (!cardRef.current) return;
+    try {
+      setIsExporting('copy');
+      const blob = await toBlob(cardRef.current, {
+        pixelRatio: 2.5,
+        cacheBust: true,
+        backgroundColor: '#FAF9F6'
+      });
+      if (blob) {
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob })
+        ]);
+        setImageCopied(true);
+        setTimeout(() => setImageCopied(false), 2500);
+      }
+    } catch (err) {
+      console.warn('Direct clipboard image write failed, falling back to download:', err);
+      // Fallback to downloading image if clipboard item API is blocked by browser/permission
+      await handleDownloadImage();
+    } finally {
+      setIsExporting(null);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-sm overflow-y-auto animate-fadeIn">
       <div className="w-full max-w-lg bg-white border-2 sm:border-3 border-black shadow-[6px_6px_0px_#000] sm:shadow-[10px_10px_0px_#000] rounded-none my-auto">
@@ -97,7 +147,7 @@ Verified by Admin: ${adminName}`;
         </div>
 
         {/* ─── THE SCREENSHOT FRAME (100% Self-Contained) ─── */}
-        <div id="whatsapp-screenshot-node" className="p-4 sm:p-6 bg-[#FAF9F6] text-black">
+        <div ref={cardRef} id="whatsapp-screenshot-node" className="p-4 sm:p-6 bg-[#FAF9F6] text-black">
           {/* Snapshot Header */}
           <div className="bg-black text-white p-3 sm:p-4 border-2 border-black mb-3 sm:mb-4 flex items-center justify-between">
             <div className="flex items-center gap-2 sm:gap-3">
@@ -205,26 +255,66 @@ Verified by Admin: ${adminName}`;
         </div>
 
         {/* Action Controls for Admin */}
-        <div className="p-3 sm:p-4 bg-white border-t-2 sm:border-t-3 border-black flex flex-col sm:flex-row gap-2 sm:gap-3">
+        <div className="p-3 sm:p-4 bg-white border-t-2 sm:border-t-3 border-black space-y-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <button
+              onClick={handleDownloadImage}
+              disabled={isExporting !== null}
+              className="brutal-btn py-2.5 px-3 bg-[#FFE600] text-black font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-[#FFF275] disabled:opacity-50"
+            >
+              {isExporting === 'download' ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Exporting HD PNG...
+                </>
+              ) : (
+                <>
+                  <Download className="w-4 h-4" />
+                  Download PNG
+                </>
+              )}
+            </button>
+
+            <button
+              onClick={handleCopyImage}
+              disabled={isExporting !== null}
+              className="brutal-btn py-2.5 px-3 bg-white text-black font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-black hover:text-white transition-all disabled:opacity-50"
+            >
+              {isExporting === 'copy' ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Copying Image...
+                </>
+              ) : imageCopied ? (
+                <>
+                  <Check className="w-4 h-4 text-emerald-600" />
+                  Image Copied!
+                </>
+              ) : (
+                <>
+                  <ImageIcon className="w-4 h-4" />
+                  Copy Image
+                </>
+              )}
+            </button>
+          </div>
+
           <button
             onClick={handleCopyText}
-            className="flex-1 brutal-btn py-2.5 px-4 bg-[#FFE600] text-black font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-[#FFF275]"
+            className="w-full brutal-btn py-2 px-3 bg-gray-100 text-black font-bold text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-gray-200"
           >
             {copied ? (
               <>
-                <Check className="w-4 h-4 text-emerald-700" />
-                Copied WhatsApp Text!
+                <Check className="w-3.5 h-3.5 text-emerald-700" />
+                Copied WhatsApp Text Message!
               </>
             ) : (
               <>
-                <Copy className="w-4 h-4" />
-                Copy Text for WhatsApp
+                <Copy className="w-3.5 h-3.5" />
+                Copy WhatsApp Text Summary
               </>
             )}
           </button>
-          <div className="text-[11px] font-mono text-black/70 flex items-center justify-center px-2 py-1 bg-gray-100 border border-black/30 text-center">
-            📸 Take a mobile screenshot now — zero cropping!
-          </div>
         </div>
       </div>
     </div>
