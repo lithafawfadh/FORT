@@ -76,15 +76,21 @@ Verified by Admin: ${adminName}`;
     setTimeout(() => setCopied(false), 2500);
   };
 
+  const getExportOptions = () => ({
+    pixelRatio: 2.5,
+    cacheBust: true,
+    skipFonts: true,
+    backgroundColor: '#FAF9F6',
+    style: {
+      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    } as any
+  });
+
   const handleDownloadImage = async () => {
     if (!cardRef.current) return;
     try {
       setIsExporting('download');
-      const dataUrl = await toPng(cardRef.current, {
-        pixelRatio: 2.5,
-        cacheBust: true,
-        backgroundColor: '#FAF9F6'
-      });
+      const dataUrl = await toPng(cardRef.current, getExportOptions());
       const link = document.createElement('a');
       link.download = `FORT-Status-${currentMonth}-${currentYear}.png`;
       link.href = dataUrl;
@@ -100,11 +106,7 @@ Verified by Admin: ${adminName}`;
     if (!cardRef.current) return;
     try {
       setIsExporting('copy');
-      const blob = await toBlob(cardRef.current, {
-        pixelRatio: 2.5,
-        cacheBust: true,
-        backgroundColor: '#FAF9F6'
-      });
+      const blob = await toBlob(cardRef.current, getExportOptions());
       if (blob) {
         await navigator.clipboard.write([
           new ClipboardItem({ 'image/png': blob })
@@ -147,40 +149,45 @@ Verified by Admin: ${adminName}`;
         </div>
 
         {/* ─── THE SCREENSHOT FRAME (100% Self-Contained) ─── */}
-        <div ref={cardRef} id="whatsapp-screenshot-node" className="p-4 sm:p-6 bg-[#FAF9F6] text-black">
+        <div
+          ref={cardRef}
+          id="whatsapp-screenshot-node"
+          className="p-4 sm:p-6 bg-[#FAF9F6] text-black font-sans antialiased"
+          style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" }}
+        >
           {/* Snapshot Header */}
-          <div className="bg-black text-white p-3 sm:p-4 border-2 border-black mb-3 sm:mb-4 flex items-center justify-between">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="w-8 h-8 bg-[#FFE600] text-black font-black flex items-center justify-center text-sm border border-white">
+          <div className="bg-black text-white p-3 sm:p-4 border-2 border-black mb-3 sm:mb-4 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <div className="w-8 h-8 bg-[#FFE600] text-black font-black flex items-center justify-center text-sm border border-white shrink-0">
                 FT
               </div>
-              <div>
-                <h4 className="font-black text-xs sm:text-sm tracking-widest uppercase text-white">
+              <div className="flex flex-col justify-center min-w-0">
+                <h4 className="font-black text-xs sm:text-sm tracking-wider uppercase text-white whitespace-nowrap leading-none mb-1">
                   F.O.R.T LEDGER
                 </h4>
-                <p className="text-[9px] font-mono text-[#FFE600] tracking-wider font-bold">
+                <p className="text-[9px] font-mono text-[#FFE600] tracking-wider font-bold whitespace-nowrap leading-none">
                   OFFICIAL STATUS REPORT
                 </p>
               </div>
             </div>
-            <div className="bg-[#FFE600] text-black px-2 py-1 text-[10px] font-black uppercase tracking-wider border border-white">
+            <div className="bg-[#FFE600] text-black px-2.5 py-1 text-[10px] font-black uppercase tracking-wider border border-white whitespace-nowrap shrink-0 self-center">
               {currentMonth.toUpperCase()} {currentYear}
             </div>
           </div>
 
           {/* Hero Vault Box */}
           <div className="bg-[#FFE600] border-2 border-black p-4 mb-3 sm:mb-4 shadow-[3px_3px_0px_#000]">
-            <div className="flex justify-between items-start mb-1">
-              <span className="text-[10px] font-black tracking-widest uppercase text-black underline underline-offset-4 decoration-2">
+            <div className="flex justify-between items-start mb-1 gap-2">
+              <span className="text-[10px] font-black tracking-wider uppercase text-black underline underline-offset-4 decoration-2 whitespace-nowrap">
                 TOTAL AVAILABLE FUNDS
               </span>
-              <span className="bg-black text-white text-[9px] font-mono font-bold px-1.5 py-0.5 border border-black flex items-center gap-1">
+              <span className="bg-black text-white text-[9px] font-mono font-bold px-1.5 py-0.5 border border-black flex items-center gap-1 shrink-0 whitespace-nowrap">
                 <ArrowUpRight className="w-3 h-3 text-[#FFE600]" /> +LKR {groupStats.monthlyCollection.toLocaleString()}
               </span>
             </div>
             <div className="flex items-baseline gap-2 mt-2">
               <span className="text-sm sm:text-base font-black text-black/60 font-mono">LKR</span>
-              <span className="text-3xl sm:text-4xl font-black text-black tracking-tight font-sans">
+              <span className="text-3xl sm:text-4xl font-black text-black tracking-tight font-sans whitespace-nowrap">
                 {groupStats.totalFunds.toLocaleString()}
               </span>
             </div>
@@ -190,28 +197,32 @@ Verified by Admin: ${adminName}`;
           <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-3 sm:mb-4">
             {/* Box 1: Collection / Inflow */}
             <div className="bg-white border-2 border-black p-3 sm:p-3.5 shadow-[2px_2px_0px_#000]">
-              <div className="flex items-center justify-between text-black/60 mb-1">
-                <span className="text-[9px] font-black tracking-wider uppercase">This Month's Collection</span>
-                <DollarSign className="w-3.5 h-3.5 text-black" />
+              <div className="flex items-center justify-between text-black/60 mb-1 gap-1">
+                <span className="text-[9px] font-black tracking-wider uppercase whitespace-nowrap truncate">
+                  This Month's Collection
+                </span>
+                <DollarSign className="w-3.5 h-3.5 text-black shrink-0" />
               </div>
-              <p className="text-lg sm:text-xl font-black text-black tracking-tight">
+              <p className="text-lg sm:text-xl font-black text-black tracking-tight whitespace-nowrap">
                 LKR {groupStats.monthlyCollection.toLocaleString()}
               </p>
-              <span className="text-[10px] font-mono font-bold text-emerald-600 block mt-0.5">
+              <span className="text-[10px] font-mono font-bold text-emerald-600 block mt-0.5 whitespace-nowrap">
                 {Math.round(actualComplianceRate)}% Paid ({paidCount}/{activeMembersList.length})
               </span>
             </div>
 
             {/* Box 2: Active Loans / Capital Out */}
             <div className="bg-white border-2 border-black p-3 sm:p-3.5 shadow-[2px_2px_0px_#000]">
-              <div className="flex items-center justify-between text-black/60 mb-1">
-                <span className="text-[9px] font-black tracking-wider uppercase">Active Loans</span>
-                <CreditCard className="w-3.5 h-3.5 text-black" />
+              <div className="flex items-center justify-between text-black/60 mb-1 gap-1">
+                <span className="text-[9px] font-black tracking-wider uppercase whitespace-nowrap truncate">
+                  Active Loans
+                </span>
+                <CreditCard className="w-3.5 h-3.5 text-black shrink-0" />
               </div>
-              <p className="text-lg sm:text-xl font-black text-black tracking-tight">
+              <p className="text-lg sm:text-xl font-black text-black tracking-tight whitespace-nowrap">
                 LKR {totalLoanAmount.toLocaleString()}
               </p>
-              <span className="text-[10px] font-mono font-bold text-black/70 block mt-0.5">
+              <span className="text-[10px] font-mono font-bold text-black/70 block mt-0.5 whitespace-nowrap">
                 {activeLoans.length} Active {activeLoans.length === 1 ? 'Loan' : 'Loans'} Out
               </span>
             </div>
@@ -219,11 +230,11 @@ Verified by Admin: ${adminName}`;
 
           {/* Member Roll Call Mini Pills */}
           <div className="bg-white border-2 border-black p-3 mb-3 sm:mb-4 shadow-[2px_2px_0px_#000]">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-black tracking-wider uppercase text-black">
+            <div className="flex items-center justify-between mb-2 gap-2">
+              <span className="text-[10px] font-black tracking-wider uppercase text-black whitespace-nowrap">
                 PAYMENT STATUS ({paidCount}/{activeMembersList.length})
               </span>
-              <span className="text-[9px] font-mono font-bold bg-[#FFE600] px-1.5 py-0.2 border border-black">
+              <span className="text-[9px] font-mono font-bold bg-[#FFE600] px-1.5 py-0.5 border border-black shrink-0 whitespace-nowrap">
                 {paidCount === activeMembersList.length ? 'ALL SETTLED' : `${activeMembersList.length - paidCount} PENDING`}
               </span>
             </div>
@@ -233,14 +244,14 @@ Verified by Admin: ${adminName}`;
                 return (
                   <div
                     key={member.id}
-                    className={`px-2 py-1 border text-[10px] font-bold flex items-center justify-between ${
+                    className={`px-2 py-1 border text-[10px] font-bold flex items-center justify-between gap-1 ${
                       isPaid
                         ? 'bg-emerald-50 border-emerald-500 text-emerald-900'
                         : 'bg-amber-50 border-amber-500 text-amber-900'
                     }`}
                   >
-                    <span className="truncate">{member.name}</span>
-                    <span className="text-[9px] ml-1">{isPaid ? '✓' : '•'}</span>
+                    <span className="truncate whitespace-nowrap">{member.name}</span>
+                    <span className="text-[9px] font-bold shrink-0">{isPaid ? '✓' : '•'}</span>
                   </div>
                 );
               })}
