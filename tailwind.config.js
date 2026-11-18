@@ -36,7 +36,7 @@ export default {
       fontFamily: {
         serif: ['"Noto Serif"', 'serif'],
         sans: ['"Inter"', 'sans-serif'],
-        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       boxShadow: {
         'ambient': '0 20px 50px rgba(0, 0, 0, 0.5)',
