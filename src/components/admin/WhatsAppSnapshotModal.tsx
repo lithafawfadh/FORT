@@ -82,7 +82,22 @@ Verified by Admin: ${adminName}`;
     return {
       pixelRatio: 2.5,
       cacheBust: true,
-      fontEmbedCSS: SNAPSHOT_FONT_EMBED_CSS,
+      fontEmbedCSS: `${SNAPSHOT_FONT_EMBED_CSS}
+#whatsapp-screenshot-node .font-black {
+  font-weight: 600 !important;
+}
+#whatsapp-screenshot-node .font-bold {
+  font-weight: 600 !important;
+}
+#whatsapp-screenshot-node h4.font-black,
+#whatsapp-screenshot-node span.font-black {
+  font-weight: 600 !important;
+}
+#whatsapp-screenshot-node .text-3xl,
+#whatsapp-screenshot-node .text-4xl {
+  font-weight: 700 !important;
+}
+`,
       backgroundColor: '#FAF9F6',
       width: targetWidth,
       style: {
