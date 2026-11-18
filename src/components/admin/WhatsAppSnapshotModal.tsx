@@ -77,12 +77,22 @@ Verified by Admin: ${adminName}`;
     setTimeout(() => setCopied(false), 2500);
   };
 
-  const getExportOptions = () => ({
-    pixelRatio: 2.5,
-    cacheBust: true,
-    fontEmbedCSS: SNAPSHOT_FONT_EMBED_CSS,
-    backgroundColor: '#FAF9F6',
-  });
+  const getExportOptions = (node: HTMLElement) => {
+    const targetWidth = Math.max(node.offsetWidth || 0, 540);
+    return {
+      pixelRatio: 2.5,
+      cacheBust: true,
+      fontEmbedCSS: SNAPSHOT_FONT_EMBED_CSS,
+      backgroundColor: '#FAF9F6',
+      width: targetWidth,
+      style: {
+        width: `${targetWidth}px`,
+        maxWidth: `${targetWidth}px`,
+        minWidth: `${targetWidth}px`,
+        margin: '0 auto',
+      } as any,
+    };
+  };
 
   const handleDownloadImage = async () => {
     if (!cardRef.current) return;
@@ -91,7 +101,7 @@ Verified by Admin: ${adminName}`;
       if (document.fonts) {
         await document.fonts.ready;
       }
-      const dataUrl = await toPng(cardRef.current, getExportOptions());
+      const dataUrl = await toPng(cardRef.current, getExportOptions(cardRef.current));
       const link = document.createElement('a');
       link.download = `FORT-Status-${currentMonth}-${currentYear}.png`;
       link.href = dataUrl;
@@ -110,7 +120,7 @@ Verified by Admin: ${adminName}`;
       if (document.fonts) {
         await document.fonts.ready;
       }
-      const blob = await toBlob(cardRef.current, getExportOptions());
+      const blob = await toBlob(cardRef.current, getExportOptions(cardRef.current));
       if (blob) {
         await navigator.clipboard.write([
           new ClipboardItem({ 'image/png': blob })
@@ -129,7 +139,7 @@ Verified by Admin: ${adminName}`;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-sm overflow-y-auto animate-fadeIn">
-      <div className="w-full max-w-lg bg-white border-2 sm:border-3 border-black shadow-[6px_6px_0px_#000] sm:shadow-[10px_10px_0px_#000] rounded-none my-auto">
+      <div className="w-full max-w-[540px] bg-white border-2 sm:border-3 border-black shadow-[6px_6px_0px_#000] sm:shadow-[10px_10px_0px_#000] rounded-none my-auto">
         {/* Modal Top Control Bar */}
         <div className="bg-[#FFE600] border-b-2 sm:border-b-3 border-black p-3 sm:p-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -201,7 +211,7 @@ Verified by Admin: ${adminName}`;
             {/* Box 1: Collection / Inflow */}
             <div className="bg-white border-2 border-black p-3 sm:p-3.5 shadow-[2px_2px_0px_#000]">
               <div className="flex items-center justify-between text-black/60 mb-1 gap-1">
-                <span className="text-[9px] font-black tracking-wider uppercase whitespace-nowrap truncate">
+                <span className="text-[8.5px] sm:text-[9px] font-black tracking-wider uppercase whitespace-nowrap">
                   This Month's Collection
                 </span>
                 <DollarSign className="w-3.5 h-3.5 text-black shrink-0" />
@@ -217,7 +227,7 @@ Verified by Admin: ${adminName}`;
             {/* Box 2: Active Loans / Capital Out */}
             <div className="bg-white border-2 border-black p-3 sm:p-3.5 shadow-[2px_2px_0px_#000]">
               <div className="flex items-center justify-between text-black/60 mb-1 gap-1">
-                <span className="text-[9px] font-black tracking-wider uppercase whitespace-nowrap truncate">
+                <span className="text-[8.5px] sm:text-[9px] font-black tracking-wider uppercase whitespace-nowrap">
                   Active Loans
                 </span>
                 <CreditCard className="w-3.5 h-3.5 text-black shrink-0" />
@@ -253,7 +263,7 @@ Verified by Admin: ${adminName}`;
                         : 'bg-amber-50 border-amber-500 text-amber-900'
                     }`}
                   >
-                    <span className="truncate whitespace-nowrap">{member.name}</span>
+                    <span className="whitespace-nowrap font-bold text-[9.5px] sm:text-[10px]">{member.name}</span>
                     <span className="text-[9px] font-bold shrink-0">{isPaid ? '✓' : '•'}</span>
                   </div>
                 );
