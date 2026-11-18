@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Share2, Copy, Check, X, Camera, Users, DollarSign, CreditCard, ArrowUpRight, Download, Image as ImageIcon, Loader2 } from 'lucide-react';
-import html2canvas from 'html2canvas';
+import { toPng, toBlob } from 'html-to-image';
+import { SNAPSHOT_FONT_EMBED_CSS } from '../../utils/snapshotFontEmbedCss';
 import { GroupStats, User, Payment, Loan } from '../../types';
 
 interface WhatsAppSnapshotModalProps {
@@ -76,24 +77,21 @@ Verified by Admin: ${adminName}`;
     setTimeout(() => setCopied(false), 2500);
   };
 
-  const renderCardCanvas = async (node: HTMLElement) => {
-    if (document.fonts) {
-      await document.fonts.ready;
-    }
-    return html2canvas(node, {
-      scale: 2.5,
-      backgroundColor: '#FAF9F6',
-      useCORS: true,
-      logging: false,
-    });
-  };
+  const getExportOptions = () => ({
+    pixelRatio: 2.5,
+    cacheBust: true,
+    fontEmbedCSS: SNAPSHOT_FONT_EMBED_CSS,
+    backgroundColor: '#FAF9F6',
+  });
 
   const handleDownloadImage = async () => {
     if (!cardRef.current) return;
     try {
       setIsExporting('download');
-      const canvas = await renderCardCanvas(cardRef.current);
-      const dataUrl = canvas.toDataURL('image/png');
+      if (document.fonts) {
+        await document.fonts.ready;
+      }
+      const dataUrl = await toPng(cardRef.current, getExportOptions());
       const link = document.createElement('a');
       link.download = `FORT-Status-${currentMonth}-${currentYear}.png`;
       link.href = dataUrl;
@@ -109,10 +107,10 @@ Verified by Admin: ${adminName}`;
     if (!cardRef.current) return;
     try {
       setIsExporting('copy');
-      const canvas = await renderCardCanvas(cardRef.current);
-      const blob = await new Promise<Blob | null>((resolve) =>
-        canvas.toBlob(resolve, 'image/png')
-      );
+      if (document.fonts) {
+        await document.fonts.ready;
+      }
+      const blob = await toBlob(cardRef.current, getExportOptions());
       if (blob) {
         await navigator.clipboard.write([
           new ClipboardItem({ 'image/png': blob })
