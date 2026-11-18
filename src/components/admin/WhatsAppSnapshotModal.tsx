@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Share2, Copy, Check, X, Camera, Users, DollarSign, CreditCard, ArrowUpRight, Download, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { toPng, toBlob } from 'html-to-image';
-import { SNAPSHOT_FONT_EMBED_CSS } from '../../utils/snapshotFontEmbedCss';
 import { GroupStats, User, Payment, Loan } from '../../types';
 
 interface WhatsAppSnapshotModalProps {
@@ -80,10 +79,10 @@ Verified by Admin: ${adminName}`;
   const getExportOptions = () => ({
     pixelRatio: 2.5,
     cacheBust: true,
-    fontEmbedCSS: SNAPSHOT_FONT_EMBED_CSS,
+    skipFonts: true,
     backgroundColor: '#FAF9F6',
     style: {
-      fontFamily: "'Inter', sans-serif"
+      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
     } as any
   });
 
@@ -154,7 +153,7 @@ Verified by Admin: ${adminName}`;
           ref={cardRef}
           id="whatsapp-screenshot-node"
           className="p-4 sm:p-6 bg-[#FAF9F6] text-black font-sans antialiased"
-          style={{ fontFamily: "'Inter', sans-serif" }}
+          style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" }}
         >
           {/* Snapshot Header */}
           <div className="bg-black text-white p-3 sm:p-4 border-2 border-black mb-3 sm:mb-4 flex items-center justify-between gap-3">
